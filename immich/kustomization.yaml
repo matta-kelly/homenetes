@@ -1,9 +1,18 @@
 # ==============================================================================
 # Immich
 # ==============================================================================
-# TODO: Photo management
+# Self-hosted photo/video management - https://immich.app
 # ==============================================================================
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: []
+resources:
+  - secrets.yaml
+  - backup-secret.yaml
+  - database.yaml
+  - redis.yaml
+  - pvc.yaml
+  - server-deployment.yaml
+  - ml-deployment.yaml
+  - service.yaml
+  - ingress.yaml

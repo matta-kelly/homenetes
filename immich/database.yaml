@@ -1,0 +1,77 @@
+# ==============================================================================
+# Immich PostgreSQL Database (CloudNativePG)
+# ==============================================================================
+# Uses pgvecto.rs for ML vector similarity search (face recognition, CLIP)
+# ==============================================================================
+
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-db
+  labels:
+    app.kubernetes.io/name: immich
+spec:
+  instances: 1
+
+  # PostgreSQL 16 with pgvecto.rs extension
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0
+
+  # Enable vector extension
+  postgresql:
+    shared_preload_libraries:
+      - "vectors.so"
+
+  # Storage on bulk storage node
+  storage:
+    size: 10Gi
+    storageClass: local-path
+
+  # Node placement
+  affinity:
+    nodeSelector:
+      storage.h-kube.io/bulk: "true"
+
+  # Database bootstrap with required extensions
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+      secret:
+        name: immich-secrets
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS "vectors"
+        - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE
+        - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE
+        - CREATE EXTENSION IF NOT EXISTS "pg_trgm" CASCADE
+        - CREATE EXTENSION IF NOT EXISTS "unaccent" CASCADE
+
+  # Backup to SeaweedFS S3
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://cnpg-backups/immich
+      endpointURL: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+      s3Credentials:
+        accessKeyId:
+          name: immich-db-backup-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: immich-db-backup-creds
+          key: SECRET_ACCESS_KEY
+    retentionPolicy: "7d"
+
+---
+# ==============================================================================
+# Scheduled Backup - Daily at 2am
+# ==============================================================================
+
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: immich-db-backup
+  labels:
+    app.kubernetes.io/name: immich
+spec:
+  schedule: "0 2 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: immich-db

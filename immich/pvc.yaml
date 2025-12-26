@@ -1,0 +1,34 @@
+# ==============================================================================
+# Immich Persistent Volume Claims
+# ==============================================================================
+# Using SeaweedFS for distributed cloud-native storage
+# ==============================================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library
+  labels:
+    app.kubernetes.io/name: immich
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: seaweedfs-storage
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-model-cache
+  labels:
+    app.kubernetes.io/name: immich
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: seaweedfs-storage
+  resources:
+    requests:
+      storage: 10Gi

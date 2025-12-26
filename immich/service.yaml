@@ -1,0 +1,40 @@
+# ==============================================================================
+# Immich Services
+# ==============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-server
+  labels:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: server
+  ports:
+    - name: http
+      port: 2283
+      targetPort: http
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-ml
+  labels:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: machine-learning
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: machine-learning
+  ports:
+    - name: http
+      port: 3003
+      targetPort: http
+      protocol: TCP

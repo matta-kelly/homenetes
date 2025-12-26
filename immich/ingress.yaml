@@ -1,0 +1,33 @@
+# ==============================================================================
+# Immich Ingress
+# ==============================================================================
+# Traefik ingress with cert-manager TLS
+# ==============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: immich
+  labels:
+    app.kubernetes.io/name: immich
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Large file uploads for photos/videos
+    traefik.ingress.kubernetes.io/router.middlewares: ""
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: immich.${HOMENETES_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: immich-server
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - immich.${HOMENETES_DOMAIN}
+      secretName: immich-tls
