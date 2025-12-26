@@ -1,8 +1,7 @@
 # ==============================================================================
 # Vaultwarden Deployment
 # ==============================================================================
-# Single-replica deployment with SQLite storage
-# Uses Recreate strategy - SQLite doesn't support concurrent writes
+# Single-replica deployment with PostgreSQL (CNPG)
 # ==============================================================================
 
 apiVersion: apps/v1
@@ -14,7 +13,7 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app.kubernetes.io/name: vaultwarden
@@ -26,6 +25,12 @@ spec:
       # Place on node with bulk storage
       nodeSelector:
         storage.h-kube.io/bulk: "true"
+
+      # Wait for database to be ready
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z vaultwarden-db-rw 5432; do echo waiting for database; sleep 2; done']
 
       containers:
         - name: vaultwarden
@@ -39,6 +44,13 @@ spec:
             # Domain must match external URL exactly
             - name: DOMAIN
               value: "https://vaultwarden.${HOMENETES_DOMAIN}"
+
+            # PostgreSQL connection (from CNPG secret)
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vaultwarden-db-app
+                  key: uri
 
             # Registration controls
             - name: SIGNUPS_ALLOWED
