@@ -1,0 +1,20 @@
+# ==============================================================================
+# Vaultwarden Persistent Volume Claim
+# ==============================================================================
+# Uses local-path provisioner - lands on bulk storage node
+# Stores SQLite database, attachments, and icons
+# ==============================================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vaultwarden-data
+  labels:
+    app.kubernetes.io/name: vaultwarden
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi

@@ -1,0 +1,21 @@
+# ==============================================================================
+# Vaultwarden Service
+# ==============================================================================
+# Single port - v1.29+ handles WebSocket on same port as HTTP
+# ==============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: vaultwarden
+  labels:
+    app.kubernetes.io/name: vaultwarden
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: vaultwarden
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

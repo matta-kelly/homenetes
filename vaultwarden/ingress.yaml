@@ -1,0 +1,32 @@
+# ==============================================================================
+# Vaultwarden Ingress
+# ==============================================================================
+# Traefik ingress with cert-manager TLS
+# NO Authentik ForwardAuth - Vaultwarden handles its own auth
+# ==============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vaultwarden
+  labels:
+    app.kubernetes.io/name: vaultwarden
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: vaultwarden.${HOMENETES_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vaultwarden
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - vaultwarden.${HOMENETES_DOMAIN}
+      secretName: vaultwarden-tls
