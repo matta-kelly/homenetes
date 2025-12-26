@@ -97,5 +97,6 @@ spec:
 
       volumes:
         - name: library
-          persistentVolumeClaim:
-            claimName: immich-library
+          hostPath:
+            path: /mnt/bulk-storage/immich/library
+            type: Directory
