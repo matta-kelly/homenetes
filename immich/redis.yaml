@@ -23,6 +23,10 @@ spec:
         app.kubernetes.io/name: immich
         app.kubernetes.io/component: redis
     spec:
+      # Place on node with bulk storage (gpa-server)
+      nodeSelector:
+        storage.h-kube.io/bulk: "true"
+
       containers:
         - name: redis
           image: redis:7-alpine

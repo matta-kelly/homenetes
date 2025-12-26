@@ -32,12 +32,11 @@ spec:
       storage.h-kube.io/bulk: "true"
 
   # Database bootstrap with required extensions
+  # CNPG auto-generates immich-db-app secret with credentials
   bootstrap:
     initdb:
       database: immich
       owner: immich
-      secret:
-        name: immich-secrets
       postInitSQL:
         - CREATE EXTENSION IF NOT EXISTS "vectors"
         - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE

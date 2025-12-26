@@ -25,6 +25,10 @@ spec:
         app.kubernetes.io/name: immich
         app.kubernetes.io/component: server
     spec:
+      # Place on node with bulk storage (gpa-server)
+      nodeSelector:
+        storage.h-kube.io/bulk: "true"
+
       # Wait for database to be ready
       initContainers:
         - name: wait-for-db
@@ -52,8 +56,8 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: immich-secrets
-                  key: DB_PASSWORD
+                  name: immich-db-app
+                  key: password
 
             # Redis connection
             - name: REDIS_HOSTNAME
