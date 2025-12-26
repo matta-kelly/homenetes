@@ -43,6 +43,9 @@ spec:
         - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE
         - CREATE EXTENSION IF NOT EXISTS "pg_trgm" CASCADE
         - CREATE EXTENSION IF NOT EXISTS "unaccent" CASCADE
+        - GRANT ALL ON SCHEMA vectors TO immich
+        - GRANT ALL ON ALL TABLES IN SCHEMA vectors TO immich
+        - ALTER DEFAULT PRIVILEGES IN SCHEMA vectors GRANT ALL ON TABLES TO immich
 
   # Backup to SeaweedFS S3
   backup:
